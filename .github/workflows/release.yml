@@ -176,31 +176,6 @@ jobs:
           asset_name: nhctl-linux-arm64
           asset_content_type: application/octet-stream
 
-      - name: Push nhctl to Coding Artifacts
-        env:
-          WINDOWS_BINARY: 'nhctl-windows-amd64.exe'
-          OSX_BINARY: 'nhctl-darwin-amd64'
-          OSX_ARM64_BINARY: 'nhctl-darwin-arm64'
-          LINUX_BINARY: 'nhctl-linux-amd64'
-          LINUX_ARM_BINARY: 'nhctl-linux-arm64'
-        run: |
-          cd build
-          curl -T ${WINDOWS_BINARY} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/nhctl/${WINDOWS_BINARY}?version=${GITHUB_SHA}"
-          curl -T ${OSX_BINARY} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/nhctl/${OSX_BINARY}?version=${GITHUB_SHA}"
-          curl -T ${OSX_ARM64_BINARY} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/nhctl/${OSX_ARM64_BINARY}?version=${GITHUB_SHA}"
-          curl -T ${LINUX_BINARY} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/nhctl/${LINUX_BINARY}?version=${GITHUB_SHA}"
-          curl -T ${LINUX_ARM_BINARY} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/nhctl/${LINUX_ARM_BINARY}?version=${GITHUB_SHA}"
-          curl -T ${WINDOWS_BINARY} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/nhctl/${WINDOWS_BINARY}?version=latest"
-          curl -T ${OSX_BINARY} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/nhctl/${OSX_BINARY}?version=latest"
-          curl -T ${OSX_ARM64_BINARY} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/nhctl/${OSX_ARM64_BINARY}?version=latest"
-          curl -T ${LINUX_BINARY} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/nhctl/${LINUX_BINARY}?version=latest"
-          curl -T ${LINUX_ARM_BINARY} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/nhctl/${LINUX_ARM_BINARY}?version=latest"
-          curl -T ${WINDOWS_BINARY} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/nhctl/${WINDOWS_BINARY}?version=${{ env.RELEASE_VERSION }}"
-          curl -T ${OSX_BINARY} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/nhctl/${OSX_BINARY}?version=${{ env.RELEASE_VERSION }}"
-          curl -T ${OSX_ARM64_BINARY} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/nhctl/${OSX_ARM64_BINARY}?version=${{ env.RELEASE_VERSION }}"
-          curl -T ${LINUX_BINARY} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/nhctl/${LINUX_BINARY}?version=${{ env.RELEASE_VERSION }}"
-          curl -T ${LINUX_ARM_BINARY} -u ${{ secrets.CODING_ARTIFACTS_USER }}:${{ secrets.CODING_ARTIFACTS_PASS }} "https://nocalhost-generic.pkg.coding.net/nocalhost/nhctl/${LINUX_ARM_BINARY}?version=${{ env.RELEASE_VERSION }}"
-
       - name: Update Homebrew tap
         if: "!contains(github.ref,'rc')"
         run: |
@@ -283,18 +258,6 @@ jobs:
           docker push ${GITHUB_IMAGE_NAME}:latest
           docker push ${GITHUB_IMAGE_NAME}:${{ env.RELEASE_VERSION }}
 
-      - name: Push to Coding Artifacts
-        env:
-          CODING_IMAGE_NAME: nocalhost-docker.pkg.coding.net/nocalhost/public/nocalhost-api
-        run: |
-          echo ${{ secrets.CODING_ARTIFACTS_PASS }} | docker login nocalhost-docker.pkg.coding.net -u ${{ secrets.CODING_ARTIFACTS_USER }} --password-stdin
-          docker tag nocalhost-api:${GITHUB_SHA} ${CODING_IMAGE_NAME}:${GITHUB_SHA}
-          docker tag nocalhost-api:${GITHUB_SHA} ${CODING_IMAGE_NAME}:${{ env.RELEASE_VERSION }}
-          docker tag nocalhost-api:${GITHUB_SHA} ${CODING_IMAGE_NAME}:latest
-          docker push ${CODING_IMAGE_NAME}:${GITHUB_SHA}
-          docker push ${CODING_IMAGE_NAME}:${{ env.RELEASE_VERSION }}
-          docker push ${CODING_IMAGE_NAME}:latest
-
       - name: Release dep-docker
         run: make dep-docker
 
@@ -308,18 +271,6 @@ jobs:
           docker push ${GITHUB_IMAGE_NAME}:${GITHUB_SHA}
           docker push ${GITHUB_IMAGE_NAME}:latest
           docker push ${GITHUB_IMAGE_NAME}:${{ env.RELEASE_VERSION }}
-
-      - name: Push to Coding Artifacts
-        env:
-          CODING_IMAGE_NAME: nocalhost-docker.pkg.coding.net/nocalhost/public/nocalhost-dep
-        run: |
-          echo ${{ secrets.CODING_ARTIFACTS_PASS }} | docker login nocalhost-docker.pkg.coding.net -u ${{ secrets.CODING_ARTIFACTS_USER }} --password-stdin
-          docker tag nocalhost-dep:${GITHUB_SHA} ${CODING_IMAGE_NAME}:${GITHUB_SHA}
-          docker tag nocalhost-dep:${GITHUB_SHA} ${CODING_IMAGE_NAME}:${{ env.RELEASE_VERSION }}
-          docker tag nocalhost-dep:${GITHUB_SHA} ${CODING_IMAGE_NAME}:latest
-          docker push ${CODING_IMAGE_NAME}:${GITHUB_SHA}
-          docker push ${CODING_IMAGE_NAME}:${{ env.RELEASE_VERSION }}
-          docker push ${CODING_IMAGE_NAME}:latest
 
       - name: Release dep-installer-job-docker
         env:
@@ -336,18 +287,6 @@ jobs:
           docker push ${GITHUB_IMAGE_NAME}:${GITHUB_SHA}
           docker push ${GITHUB_IMAGE_NAME}:latest
           docker push ${GITHUB_IMAGE_NAME}:${{ env.RELEASE_VERSION }}
-
-      - name: Push to Coding Artifacts
-        env:
-          CODING_IMAGE_NAME: nocalhost-docker.pkg.coding.net/nocalhost/public/dep-installer-job
-        run: |
-          echo ${{ secrets.CODING_ARTIFACTS_PASS }} | docker login nocalhost-docker.pkg.coding.net -u ${{ secrets.CODING_ARTIFACTS_USER }} --password-stdin
-          docker tag dep-installer-job:${GITHUB_SHA} ${CODING_IMAGE_NAME}:${GITHUB_SHA}
-          docker tag dep-installer-job:${GITHUB_SHA} ${CODING_IMAGE_NAME}:${{ env.RELEASE_VERSION }}
-          docker tag dep-installer-job:${GITHUB_SHA} ${CODING_IMAGE_NAME}:latest
-          docker push ${CODING_IMAGE_NAME}:${GITHUB_SHA}
-          docker push ${CODING_IMAGE_NAME}:${{ env.RELEASE_VERSION }}
-          docker push ${CODING_IMAGE_NAME}:latest
 
       - name: Release vscode plugin
         if: "!contains(github.ref,'rc')"
@@ -371,19 +310,6 @@ jobs:
           git tag '${{ env.RELEASE_VERSION }}'
           git push https://${{ secrets.GPR_USER }}:${{ secrets.GPR_PASS }}@github.com/nocalhost/nocalhost-intellij-plugin.git '${{ env.RELEASE_VERSION }}'
 
-  update-coding-git-repo:
-    name: Update CODING git repo
-    runs-on: ubuntu-latest
-    steps:
-      - name: curl
-        run: |
-          curl --location --request POST 'https://nocalhost.coding.net/api/user/nocalhost/project/nocalhost/depot/nocalhost/git/import' \
-          --header 'Authorization: Basic ${{ secrets.CODING_PERSONAL_KEY }}' \
-          --header 'Content-Type: application/x-www-form-urlencoded' \
-          --data-urlencode 'originUrl=https://github.com/nocalhost/nocalhost.git' \
-          --data-urlencode 'name=nocalhost' \
-          --data-urlencode 'type=1'
-
   release-helm-chart:
     name: Release Nocalhost Helm Chart
     needs: [ release-nhctl, release-docker-image ]
@@ -397,15 +323,6 @@ jobs:
         with:
           version: "v3.6.3"
 
-      - name: Helm plugin installer
-        run: |
-          helm plugin install https://e.coding.net/coding-public/helm-push
-
-      - name: Add helm repo
-        run: |
-          helm repo add --username ${{ secrets.CODING_ARTIFACTS_USER }} --password ${{ secrets.CODING_ARTIFACTS_PASS }} nocalhost "https://nocalhost-helm.pkg.coding.net/nocalhost/nocalhost"
-          helm repo add --username ${{ secrets.CODING_ARTIFACTS_USER }} --password ${{ secrets.CODING_ARTIFACTS_PASS }} nocalhost-dep "https://nocalhost-helm.pkg.coding.net/nocalhost/helm"
-
       - name: Change chart version
         run: |
           VERSION=${GITHUB_REF#refs/*/}
@@ -414,11 +331,6 @@ jobs:
           sed -i "s/tag:.*$/tag: \"${VERSION}\"/" deployments/chart/values.yaml
           sed -i "s/^appVersion:.*$/appVersion: \"${VERSION}\"/;s/^version:.*$/version: ${CHART_VERSION}/" deployments/dep-chart/Chart.yaml
           sed -i "s/tag:.*$/tag: \"${VERSION}\"/" deployments/dep-chart/values.yaml
-
-      - name: Push to helm repo
-        run: |
-          helm push deployments/chart nocalhost
-          helm push deployments/dep-chart nocalhost-dep
 
       - name: Tar chart
         run: |
