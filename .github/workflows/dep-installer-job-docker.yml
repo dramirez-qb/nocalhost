@@ -17,6 +17,13 @@ jobs:
       - name: Build dep-installer-job-docker
         run: make dep-installer-job-docker
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Push to Github packages
         if: ${{ github.ref == 'refs/heads/main'}}
         env:
