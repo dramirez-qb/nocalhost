@@ -17,6 +17,13 @@ jobs:
       - name: Build dep-installer-job-docker
         run: make dep-installer-job-docker
 
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Push to Github packages
         if: ${{ github.ref == 'refs/heads/main'}}
         env:
@@ -32,21 +39,3 @@ jobs:
         run: |
           docker tag dep-installer-job:${GITHUB_SHA} ${GITHUB_IMAGE_NAME}:latest
           docker push ${GITHUB_IMAGE_NAME}:latest
-
-      - name: Push to Coding Artifacts
-        if: ${{ github.repository == 'nocalhost/nocalhost' }}
-        env:
-          CODING_IMAGE_NAME: nocalhost-docker.pkg.coding.net/nocalhost/public/dep-installer-job
-        run: |
-          echo ${{ secrets.CODING_ARTIFACTS_PASS }} | docker login nocalhost-docker.pkg.coding.net -u ${{ secrets.CODING_ARTIFACTS_USER }} --password-stdin
-          docker tag dep-installer-job:${GITHUB_SHA} ${CODING_IMAGE_NAME}:${GITHUB_SHA}
-          docker push ${CODING_IMAGE_NAME}:${GITHUB_SHA}
-
-      - name: Push latest to Coding Artifacts
-        if: ${{ github.ref == 'refs/heads/main' && github.repository == 'nocalhost/nocalhost' }}
-        env:
-          CODING_IMAGE_NAME: nocalhost-docker.pkg.coding.net/nocalhost/public/dep-installer-job
-        run: |
-          echo ${{ secrets.CODING_ARTIFACTS_PASS }} | docker login nocalhost-docker.pkg.coding.net -u ${{ secrets.CODING_ARTIFACTS_USER }} --password-stdin
-          docker tag dep-installer-job:${GITHUB_SHA} ${CODING_IMAGE_NAME}:latest
-          docker push ${CODING_IMAGE_NAME}:latest
