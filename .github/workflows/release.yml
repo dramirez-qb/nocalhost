@@ -288,28 +288,6 @@ jobs:
           docker push ${GITHUB_IMAGE_NAME}:latest
           docker push ${GITHUB_IMAGE_NAME}:${{ env.RELEASE_VERSION }}
 
-      - name: Release vscode plugin
-        if: "!contains(github.ref,'rc')"
-        run: |
-          git clone https://github.com/nocalhost/nocalhost-vscode-plugin.git
-          cd nocalhost-vscode-plugin
-          git config user.email "nocalhost@nocalhost.dev"
-          git config user.name "nocalhost"
-          git checkout main
-          git tag ${{ env.RELEASE_VERSION }}
-          git push https://${{ secrets.GPR_USER }}:${{ secrets.GPR_PASS }}@github.com/nocalhost/nocalhost-vscode-plugin.git ${{ env.RELEASE_VERSION }}
-
-      - name: Release Intellij plugin
-        if: "!contains(github.ref,'rc')"
-        run: |
-          git clone https://github.com/nocalhost/nocalhost-intellij-plugin.git
-          cd nocalhost-intellij-plugin
-          git config user.email "nocalhost@nocalhost.dev"
-          git config user.name "nocalhost"
-          git checkout main
-          git tag '${{ env.RELEASE_VERSION }}'
-          git push https://${{ secrets.GPR_USER }}:${{ secrets.GPR_PASS }}@github.com/nocalhost/nocalhost-intellij-plugin.git '${{ env.RELEASE_VERSION }}'
-
   release-helm-chart:
     name: Release Nocalhost Helm Chart
     needs: [ release-nhctl, release-docker-image ]
